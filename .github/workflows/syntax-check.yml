@@ -1,0 +1,82 @@
+name: Syntax Check
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Check JavaScript syntax
+        run: |
+          set -e
+          for file in $(git ls-files '*.js'); do
+            echo "checking $file"
+            node --check "$file"
+          done
+
+      - name: Validate manifest.json
+        run: |
+          python3 - <<'PY'
+          import json, pathlib
+          manifest = json.loads(pathlib.Path('manifest.json').read_text(encoding='utf-8'))
+          assert manifest['manifest_version'] == 3, 'manifest_version must be 3'
+          for key in ('name', 'version', 'description', 'permissions'):
+              assert key in manifest, f'missing manifest field: {key}'
+          assert len(manifest['description']) <= 132, 'description exceeds Chrome limit (132 chars)'
+
+          refs = []
+          for script in manifest.get('content_scripts', []):
+              refs += script.get('js', []) + script.get('css', [])
+          refs.append(manifest['background']['service_worker'])
+          refs.append(manifest['options_page'])
+          refs.append(manifest['action']['default_popup'])
+          refs += list(manifest.get('icons', {}).values())
+          refs += list(manifest['action']['default_icon'].values())
+
+          missing = [path for path in refs if not pathlib.Path(path).is_file()]
+          assert not missing, f'manifest references missing files: {missing}'
+          print('manifest.json OK:', manifest['name'], manifest['version'], f'({len(refs)} files referenced)')
+          PY
+
+      - name: Scan for hardcoded internal addresses and credentials
+        run: |
+          python3 - <<'PY'
+          import re, subprocess, sys
+
+          files = subprocess.check_output(
+              ['git', 'ls-files', '*.js', '*.html', '*.json', '*.md', '*.css', '*.yml']
+          ).decode().split()
+
+          patterns = [
+              # 内网地址 / 私有网段
+              re.compile(r'https?://(?:192\.168|10\.\d+|172\.(?:1[6-9]|2\d|3[01]))\.'),
+              # 硬编码的 OpenAPI 凭证
+              re.compile(r'''(?:app_key|app_security)\s*[:=]\s*["'][A-Za-z0-9._-]{12,}["']'''),
+              # 硬编码的密码类字段
+              re.compile(r'''(?i)(?:password|passwd|secret|token)\s*[:=]\s*["'][^"']{6,}["']'''),
+          ]
+
+          hits = []
+          for path in files:
+              text = open(path, encoding='utf-8', errors='ignore').read()
+              for pattern in patterns:
+                  for match in pattern.finditer(text):
+                      hits.append(f'{path}: {match.group(0)}')
+
+          if hits:
+              print('Potential secrets found:')
+              print('\n'.join(hits))
+              sys.exit(1)
+          print('No hardcoded internal addresses or credentials detected.')
+          PY

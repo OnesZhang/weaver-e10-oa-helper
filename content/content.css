@@ -1,0 +1,32 @@
+/* E10 Helper - Content Script 样式 */
+
+/*
+ * 群组管理（/sp/hrm/privateGroupManagement）表格列宽
+ * 组件使用 table-layout: fixed，除操作列外所有数据列平分宽度，导致「群组名称」
+ * 过窄、长群组名被省略。这里把内容长度基本固定的列改为固定宽度，
+ * 不指定宽度的「群组名称」列会自动占满剩余宽度。
+ * 用 data-index 而不是列序号定位，列顺序调整时也不会错位；
+ * 操作列（operates）保持组件默认的 64px。
+ */
+.weapp-hrm-group-management .ui-table-grid-table thead th[data-index="isPrivateDesc"] { width: 80px !important; }  /* 类型 */
+.weapp-hrm-group-management .ui-table-grid-table thead th[data-index="userCount"] { width: 80px !important; }      /* 成员 */
+.weapp-hrm-group-management .ui-table-grid-table thead th[data-index="creator"] { width: 150px !important; }       /* 创建人 */
+.weapp-hrm-group-management .ui-table-grid-table thead th[data-index="createTime"] { width: 120px !important; }    /* 创建时间 */
+.weapp-hrm-group-management .ui-table-grid-table thead th[data-index="sortNum"] { width: 100px !important; }       /* 显示顺序 */
+
+/*
+ * 群组管理 - 群组信息侧滑弹窗（编辑 / 新建群组）
+ * 「群组名称」是多语言字段（ui-locale），组件默认按内容收缩为约 160px，
+ * 与「群组编号」等其他表单项（约 550px）宽度不一致。这里让它占满所在表单项列。
+ */
+.ui-dialog-container[class*="weapp-hrm-group-management"] .ui-formSwitch-LOCALE .ui-formSwitch-requiredMark-container > .ui-locale,
+.ui-dialog-container[class*="weapp-hrm-group-management"] .ui-formSwitch-LOCALE .ui-locale-input {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}
+.ui-dialog-container[class*="weapp-hrm-group-management"] .ui-formSwitch-LOCALE .ui-locale-input .ui-input {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+}

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>E10 OA Helper</h1>
+        <p class="subtitle"><span id="statusDot" class="dot"></span><span id="statusText">检测中...</span></p>
+      </div>
+      <button id="btnSettings" class="btn-icon" title="设置">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 主菜单 -->
+    <div id="mainPanel" class="panel">
+      <div id="menuList" class="menu-list">
+        <div id="menuEnvBorder" class="menu-item">
+          <span>环境边框</span>
+          <span class="toggle-track" id="envBorderToggle"><span class="toggle-thumb"></span></span>
+        </div>
+        <div id="menuConsole" class="menu-item">
+          <span>Show Console</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div id="menuSso" class="menu-item" style="display:none">
+          <span>单点登录</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div id="menuRecords" class="menu-item" style="display:none">
+          <span>人员信息记录</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div id="menuEsb" class="menu-item" style="display:none">
+          <span>重新执行动作流</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div id="menuInstanceLog" class="menu-item" style="display:none">
+          <span>查看实例日志</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div id="menuLang" class="menu-item">
+          <span>系统语言</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div id="menuPerson" class="menu-item">
+          <span>人员查询</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div id="menuSql" class="menu-item">
+          <span>SQL 查询</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div id="menuLdap" class="menu-item">
+          <span>LDAP 人员查询</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- 语言面板 -->
+    <div id="langPanel" class="panel" style="display:none">
+      <div class="sub-header">
+        <button id="langBack" class="btn-back">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <span>系统语言</span>
+        </button>
+      </div>
+      <div id="langLoading" class="lang-loading">加载中...</div>
+      <div id="langContent" style="display:none">
+        <div id="langCurrent" class="lang-current"></div>
+        <div id="langList" class="lang-list"></div>
+      </div>
+    </div>
+
+    <!-- 人员查询面板 -->
+    <div id="personPanel" class="panel" style="display:none">
+      <div class="sub-header">
+        <button id="personBack" class="btn-back">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <span>人员查询</span>
+        </button>
+      </div>
+      <div class="ldap-search-row">
+        <input type="text" id="personKeyword" class="ldap-input" placeholder="姓名 / 工号 / 邮箱 / 手机号" />
+        <button id="personSearchBtn" class="ldap-search-btn">查询</button>
+      </div>
+      <div id="personResults" class="ldap-results"></div>
+    </div>
+
+    <!-- SQL 查询面板 -->
+    <div id="sqlPanel" class="panel" style="display:none">
+      <div class="sub-header">
+        <button id="sqlBack" class="btn-back">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <span>SQL 查询</span>
+        </button>
+      </div>
+      <div class="sql-toolbar">
+        <label class="sql-conn-label" for="sqlConnId">连接 ID</label>
+        <input type="text" id="sqlConnId" class="sql-conn-input" value="4" placeholder="4" />
+        <button id="sqlRunBtn" class="ldap-search-btn">执行</button>
+      </div>
+      <textarea id="sqlInput" class="sql-input" rows="5" spellcheck="false"
+        placeholder="select ID, USERNAME from employee"></textarea>
+      <div class="sql-hint">Ctrl / ⌘ + Enter 执行</div>
+      <div id="sqlStatus" class="sql-status" style="display:none"></div>
+      <div id="sqlResult" class="sql-result"></div>
+    </div>
+
+    <!-- LDAP 搜索面板 -->
+    <div id="ldapPanel" class="panel" style="display:none">
+      <div class="sub-header">
+        <button id="ldapBack" class="btn-back">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <span>LDAP 人员查询</span>
+        </button>
+      </div>
+      <div class="ldap-search-row">
+        <input type="text" id="ldapFilter" class="ldap-input" placeholder="输入姓名、账号或邮箱" />
+        <button id="ldapSearchBtn" class="ldap-search-btn">查询</button>
+      </div>
+      <div id="ldapResults" class="ldap-results"></div>
+    </div>
+
+    <!-- LDAP 详情面板 -->
+    <div id="ldapDetailPanel" class="panel" style="display:none">
+      <div class="sub-header">
+        <button id="ldapDetailBack" class="btn-back">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <span>返回结果</span>
+        </button>
+      </div>
+      <div id="ldapDetailLoading" class="lang-loading">加载中...</div>
+      <div id="ldapDetailContent" style="display:none"></div>
+    </div>
+
+    <!-- 人员信息记录面板 -->
+    <div id="recordsPanel" class="panel" style="display:none">
+      <div class="sub-header">
+        <button id="recordsBack" class="btn-back">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          <span>人员信息记录</span>
+        </button>
+      </div>
+      <div id="recordsLoading" class="lang-loading">加载中...</div>
+    </div>
+  </div>
+
+  <script src="../lib/utils.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

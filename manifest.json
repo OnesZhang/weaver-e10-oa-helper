@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Weaver E10 OA Helper",
+  "version": "0.1.0",
+  "minimum_chrome_version": "111",
+  "description": "泛微E10 OA助手 - 提升工程师工作效率",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting",
+    "tabs",
+    "windows"
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["lib/utils.js", "content/content.js"],
+      "css": ["content/content.css"]
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/inject.js"],
+      "world": "MAIN",
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "options_page": "options/options.html",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

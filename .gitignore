@@ -1,0 +1,38 @@
+# --- macOS ---
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# --- 编辑器 / IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- 本地 AI 助手配置（不入库） ---
+.claude/
+AGENTS.local.md
+
+# --- 日志、构建产物、打包文件、密钥材料 ---
+*.log
+*.zip
+*.crx
+*.pem
+*.key
+*.p12
+*.jks
+*.tar.gz
+dist/
+build/
+node_modules/
+coverage/
+*.bak
+*.tmp
+*.orig
+*.rej
+
+# --- 本地环境配置（本扩展配置存于 chrome.storage，不入库） ---
+.env
+.env.*

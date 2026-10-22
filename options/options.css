@@ -1,0 +1,242 @@
+/* E10 Helper - Options 样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  color: #333;
+  background: #f5f5f5;
+}
+
+.container {
+  max-width: 640px;
+  margin: 40px auto;
+  padding: 0 16px;
+}
+
+header {
+  margin-bottom: 24px;
+}
+
+h1 {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #888;
+  margin-top: 4px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.card h2 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.hint {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 16px;
+}
+
+/* URL 列表 */
+.url-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.url-item {
+  padding: 10px 12px;
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.url-item:hover {
+  background: #f0f0f0;
+}
+
+.url-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.url-extra-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #eee;
+}
+
+.url-extra-row:first-of-type {
+  border-top: 1px solid #eee;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.url-extra-label {
+  font-size: 11px;
+  color: #999;
+  white-space: nowrap;
+  min-width: 72px;
+}
+
+.url-extra-input {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: "SF Mono", "Menlo", monospace;
+  outline: none;
+  background: #fff;
+  transition: border-color 0.15s;
+}
+
+.url-extra-input:focus {
+  border-color: #2196f3;
+}
+
+.url-extra-input::placeholder {
+  color: #ccc;
+}
+
+.url-env {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.url-env.dev     { background: #e3f2fd; color: #1565c0; }
+.url-env.test    { background: #fff3e0; color: #e65100; }
+.url-env.staging { background: #f3e5f5; color: #7b1fa2; }
+.url-env.prod    { background: #e8f5e9; color: #2e7d32; }
+
+.url-text {
+  flex: 1;
+  font-size: 13px;
+  font-family: "SF Mono", "Menlo", monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.url-item .btn-delete {
+  padding: 4px 8px;
+  border: none;
+  background: none;
+  color: #bbb;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.url-item .btn-delete:hover {
+  color: #e53935;
+  background: #ffebee;
+}
+
+.url-empty {
+  text-align: center;
+  padding: 20px;
+  color: #ccc;
+  font-size: 13px;
+}
+
+/* 添加行 */
+.add-row {
+  display: flex;
+  gap: 8px;
+}
+
+.add-row input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.add-row input:focus {
+  border-color: #2196f3;
+}
+
+.add-row select {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+  background: #fff;
+  cursor: pointer;
+}
+
+.add-row button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #2196f3;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.add-row button:hover {
+  background: #1976d2;
+}
+
+.error {
+  color: #e53935;
+  font-size: 12px;
+  margin-top: 8px;
+  min-height: 16px;
+}
+
+/* Toast 提示 */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  padding: 10px 20px;
+  background: #333;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s;
+}
+
+.toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}

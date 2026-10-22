@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>E10 OA Helper 设置</h1>
+      <p class="subtitle">配置 Weaver E10 OA 系统访问地址</p>
+    </header>
+
+    <section class="card">
+      <h2>OA Base URL</h2>
+      <p class="hint">添加你的 E10 系统访问地址（例如 https://oa.example.com），每个环境可单独配置 LDAP ID 和 SSO 凭证</p>
+
+      <div id="urlList" class="url-list"></div>
+
+      <div class="add-row">
+        <input type="text" id="urlInput" placeholder="例如: https://oa.example.com" />
+        <select id="envSelect">
+          <option value="dev">开发</option>
+          <option value="test">测试</option>
+          <option value="staging">预发布</option>
+          <option value="prod">生产</option>
+        </select>
+        <button id="btnAdd">添加</button>
+      </div>
+      <div id="addError" class="error"></div>
+    </section>
+
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>
