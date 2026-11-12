@@ -11,7 +11,7 @@ manifest.json          — MV3 manifest, single source of truth for permissions 
 background/service-worker.js  — service worker: badge management, OA URL matching
 content/content.js     — content script injected into all pages; handles Show Console, i18n switch, LDAP, SSO token, personnel records, SQL, instance log
 content/message-bridge.js  — fallback bridge, injected on demand by the popup when a tab lacks the content script; duplicates every message handler
-content/inject.js      — MAIN world script; unlocks the ESB action-flow log table checkboxes
+content/inject.js      — MAIN world script; unlocks the ESB action-flow log table checkboxes, shows matrix IDs on cards
 content/content.css    — injected styles for OA page overlays
 lib/utils.js           — shared utility object (E10Utils): OA API calls, storage helpers
 popup/                 — popup UI (HTML/CSS/JS); loads utils.js via <script> tag
@@ -30,16 +30,19 @@ LICENSE                — MIT
 - **Storage keys** in `chrome.storage.local`: `oaBaseUrls` (array of `{url, env, ldapId, appKey, appSecurity}`), `showConsole` (boolean), `showEnvironmentBorder` (boolean), `sqlConnId` (string, popup-level, global across environments).
 - **OA URL matching must stay consistent:** `E10Utils.matchesOaUrl` / `findOaEntry` compare origin plus path boundary and pick the longest match. Duplicated matchers live in `content/message-bridge.js` and `background/service-worker.js` — update all copies together; never fall back to `startsWith` or to another environment's URL.
 - **Show Console feature** hooks `history.pushState`/`replaceState` to inject `wea_link_keep_show_console` param into all OA navigation URLs.
+- **Matrix ID badges** (no toggle): `inject.js` runs in MAIN world because it reads React fiber props (`__reactFiber$*` → `memoizedProps.data.id`); isolated-world content scripts cannot see those expando properties. MAIN world cannot read `chrome.storage`, so `content.js` authorizes it with an `E10_HELPER_INJECT / showMatrixIds` message after matching `E10Utils.findOaEntry`; `inject.js` also sends `E10_HELPER_MATRIX_READY` on load to request authorization. It gates on pathname `/info/org/matrixSetting` or `/info/org/conditionMatrix` (list, data-maintain detail and field-maintain dialog all share those paths) with a debounced MutationObserver for SPA navigation and rerenders.
+  - ID sources: card / condition-matrix field IDs from fiber `data.id`; column IDs from `th[data-index]` (skip `selection-column` / `table-index`); row IDs from `tr[data-id]` (person matrices use a row sequence number, condition matrices use snowflake IDs); person-matrix field IDs from `[data-id]` on the field row. Card scan also caches `name → matrixId` so the detail page title can show the current matrix ID. `/info/org/conditionMatrixBatch` has no IDs to show.
+  - Badge styles live in `content/content.css` (`.e10-helper-matrix-id` base + `--title` / `--cell` variants; cell badges are absolutely positioned so table row heights stay unchanged). Every badge is click-to-copy and its container gets `data-e10-matrix-id`. Add new API paths/handlers to both `content/content.js` and `content/message-bridge.js` — this feature does not go through the popup message handlers, so no bridge change is needed.
 
 ## Editing guidelines
 
 - All UI text is in Chinese (zh-CN). Keep it consistent.
 - **Never commit real customer data or credentials:** OA base URLs of customer environments, LDAP IDs, `app_key` / `app_security` values, employee data, or screenshots of live systems. Use generic placeholders such as `https://oa.example.com`.
-- Experimental features (`SQL 查询`, `单点登录`, `重新执行动作流`, ESB 日志 checkbox 解锁) are documented as experimental in `README.md`; keep that labeling in sync when behavior changes.
+- Experimental features (`SQL 查询`, `单点登录`, `重新执行动作流`, ESB 日志 checkbox 解锁, 矩阵 ID 显示) are documented as experimental in `README.md`; keep that labeling in sync when behavior changes.
 - OA API paths are hardcoded strings in `content/content.js` message handlers — update the content script handler, the matching handler in `content/message-bridge.js` (the on-demand fallback duplicates them), and the popup caller when adding new APIs.
 - The extension matches `<all_urls>` for content scripts but only activates features on configured OA base URLs.
 - `escapeHtml` / `escapeAttr` are duplicated in popup.js and options.js (no shared module for popup/options pages). Keep both in sync if you change one.
-- Service worker uses `OffscreenCanvas` for badge icon generation — this is MV3-specific.
+- Service worker uses `OffscreenCanvas` for badge icon generation — this is MV3-specific. The generated dot icon is cached once. Badge/icon updates are async (`storage.local.get` + icon generation), so a tab can be closed before `chrome.action.setIcon` resolves: every call is wrapped in try/catch and `No tab with id` errors are treated as expected races. Never leave a `chrome.action.*` / `chrome.tabs.*` Promise unhandled in the service worker.
 
 ## Testing
 
@@ -51,3 +54,4 @@ Manual testing flow:
 3. Navigate to that OA URL and verify badge green dot appears
 4. Open popup and verify each menu item works: 环境边框, Show Console, 系统语言, 人员查询, LDAP 人员查询, SQL 查询, 人员信息记录, 查看实例日志, 重新执行动作流, 单点登录
 5. Open a dev/test page and verify the environment border and the ESB log checkbox unlock (with Show Console on)
+6. Open `/info/org/matrixSetting` and `/info/org/conditionMatrix` and verify: every card shows its matrix ID under the name (no toggle, works with Show Console off); SPA switching between the two menus re-renders badges; clicking a badge copies the plain ID. Then open a matrix's data-maintain detail and verify the title matrix ID, every `th` column ID and every row ID; open field maintenance and verify field IDs. Confirm table row heights and sticky headers are unchanged.

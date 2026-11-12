@@ -125,7 +125,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       menuEsb.style.display = '';
       menuEsb.addEventListener('click', () => {
         const target = `${esbUrl.origin}${esbUrl.pathname}?module=esb&application=${encodeURIComponent(app)}&logId=${encodeURIComponent(logId)}&showType=execute`;
-        chrome.tabs.update(tab.id, { url: target });
+        // 标签页可能已在点击前被关闭，避免未捕获的 Promise 异常
+        chrome.tabs.update(tab.id, { url: target }).catch((err) => {
+          console.warn('[E10 Helper] 打开动作流页面失败', err);
+        });
         window.close();
       });
     }

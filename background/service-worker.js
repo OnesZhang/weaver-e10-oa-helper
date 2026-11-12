@@ -2,33 +2,40 @@
  * E10 Helper - Background Service Worker
  */
 
+// 更新角标是异步的：等 storage / 图标的期间标签页可能已被关闭。
+// 这类竞态是正常现象，不算错误；其它异常仍要打出来方便排查。
+function isMissingTabError(err) {
+  return /No tab with id|Invalid tab ID/i.test((err && err.message) || '');
+}
+
+function reportError(action, err) {
+  if (isMissingTabError(err)) return;
+  console.warn('[E10 Helper] ' + action + '失败', err);
+}
+
 // 安装/更新时初始化
 chrome.runtime.onInstalled.addListener(() => {
-  refreshAllTabs();
+  refreshAllTabs().catch((err) => reportError('刷新标签页角标', err));
 });
 
 // 浏览器启动时刷新
 chrome.runtime.onStartup.addListener(() => {
-  refreshAllTabs();
+  refreshAllTabs().catch((err) => reportError('刷新标签页角标', err));
 });
 
 // 监听标签页 URL 变化，自动更新角标
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   // SPA 路由变化（pushState/replaceState）只触发 url 变化，不一定有 status = complete
   if ((changeInfo.status === 'complete' || changeInfo.url) && tab.url) {
-    updateBadge(tabId, tab.url);
+    updateBadge(tabId, tab.url).catch((err) => reportError('更新角标', err));
   }
 });
 
 // 配置变化后刷新所有标签页角标
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'local' && changes.oaBaseUrls) {
-    refreshAllTabs();
+    refreshAllTabs().catch((err) => reportError('刷新标签页角标', err));
   }
-});
-
-chrome.tabs.onRemoved.addListener((tabId) => {
-  chrome.action.setBadgeText({ text: '', tabId });
 });
 
 // 按 origin + 路径边界匹配 OA 地址（与 lib/utils.js 保持一致），
@@ -51,25 +58,40 @@ function matchesOaUrl(href, baseUrl) {
 // 检查所有现有标签页
 async function refreshAllTabs() {
   const tabs = await chrome.tabs.query({});
-  for (const tab of tabs) {
-    if (tab.url) {
-      updateBadge(tab.id, tab.url);
-    }
-  }
+  await Promise.allSettled(
+    tabs.filter((tab) => tab.url).map((tab) => updateBadge(tab.id, tab.url))
+  );
 }
 
 // 根据 URL 是否匹配已配置的 OA 地址来设置图标绿点
 async function updateBadge(tabId, url) {
-  const result = await chrome.storage.local.get('oaBaseUrls');
-  const oaUrls = result.oaBaseUrls || [];
-  const matched = oaUrls.some((u) => u && u.url && matchesOaUrl(url, u.url));
+  try {
+    const result = await chrome.storage.local.get('oaBaseUrls');
+    const oaUrls = result.oaBaseUrls || [];
+    const matched = oaUrls.some((u) => u && u.url && matchesOaUrl(url, u.url));
 
-  if (matched) {
-    const icon = await generateDotIcon();
-    chrome.action.setIcon({ imageData: icon, tabId });
-  } else {
-    chrome.action.setIcon({ path: 'icons/icon32.png', tabId });
+    if (matched) {
+      const icon = await getDotIcon();
+      await chrome.action.setIcon({ imageData: icon, tabId });
+    } else {
+      await chrome.action.setIcon({ path: 'icons/icon32.png', tabId });
+    }
+  } catch (err) {
+    reportError('更新角标', err);
   }
+}
+
+// 绿点图标只需生成一次，避免每次 onUpdated 都 fetch 图片、拉长竞态窗口
+let dotIconPromise = null;
+
+function getDotIcon() {
+  if (!dotIconPromise) {
+    dotIconPromise = generateDotIcon().catch((err) => {
+      dotIconPromise = null;
+      throw err;
+    });
+  }
+  return dotIconPromise;
 }
 
 // 生成带绿色小圆点的图标

@@ -30,3 +30,93 @@
   width: 100%;
   min-width: 0;
 }
+
+
+.ui-dialog-container[class*="weapp-esb-setting-integrateapp-application-dialog"] .ui-dialog-content {
+  width: 800px !important;
+}
+.ui-dialog-container[class*="weapp-esb-setting-integrateapp-application-dialog"] .ui-formSwitch-LOCALE .ui-formSwitch-requiredMark-container > .ui-locale,
+.ui-dialog-container[class*="weapp-esb-setting-integrateapp-application-dialog"] .ui-formSwitch-LOCALE .ui-locale-input {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}
+.ui-dialog-container[class*="weapp-esb-setting-integrateapp-application-dialog"] .ui-formSwitch-LOCALE .ui-locale-input .ui-input {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+}
+
+/*
+ * 矩阵设置（人员矩阵 / 条件矩阵）：在卡片名称下方显示矩阵 ID。
+ * 标签由 MAIN world 的 inject.js 插入，样式由内容脚本统一提供。
+ * 名称节点本身是 nowrap + ellipsis，这里用 block 子节点另起一行，
+ * 不改动原组件布局；点击标签复制纯 ID。
+ */
+.e10-helper-matrix-id {
+  display: block;
+  width: 100%;
+  height: 15px;
+  line-height: 15px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: #1677ff;
+  letter-spacing: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  user-select: all;
+  -webkit-user-select: all;
+}
+.e10-helper-matrix-id:hover {
+  color: #0958d9;
+  text-decoration: underline;
+}
+.e10-helper-matrix-id.e10-helper-copied,
+.e10-helper-matrix-id.e10-helper-copied::after {
+  color: #389e0d;
+}
+.e10-helper-matrix-id.e10-helper-copied::after {
+  content: '  ✓ 已复制';
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 400;
+}
+
+/* 详情页标题上的当前矩阵 ID：跟随标题内联显示 */
+.e10-helper-matrix-id--title {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  width: auto;
+  max-width: none;
+  height: auto;
+  line-height: 1.5;
+  margin-left: 8px;
+  padding: 1px 6px;
+  border: 1px solid #91caff;
+  border-radius: 3px;
+  background: #e6f4ff;
+  font-size: 11px;
+}
+
+/* 数据表格 / 字段维护里的列 ID、行 ID、字段 ID：绝对定位，不改行高与表格布局 */
+.e10-helper-matrix-id--cell {
+  position: absolute;
+  left: 2px;
+  bottom: 1px;
+  z-index: 2;
+  width: auto;
+  max-width: calc(100% - 4px);
+  height: 13px;
+  line-height: 13px;
+  padding: 0 2px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #0958d9;
+  font-size: 10px;
+}
+.e10-helper-matrix-id--cell:hover {
+  background: #e6f4ff;
+}

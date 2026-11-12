@@ -58,6 +58,30 @@
     }, '*');
   }
 
+  /**
+   * 矩阵卡片 ID 显示（人员矩阵 / 条件矩阵）由 MAIN world 的 inject.js 实现：
+   * 它要读页面 React fiber，但读不到 chrome.storage，因此由本脚本判断
+   * 当前 URL 是否命中已配置的 OA 地址后再授权。功能默认开启，无开关。
+   */
+  function notifyMatrixIdHelper(enabled) {
+    window.postMessage({
+      type: 'E10_HELPER_INJECT',
+      action: 'showMatrixIds',
+      enabled: !!enabled
+    }, '*');
+  }
+
+  function refreshMatrixIdAuthorization() {
+    E10Utils.getOaBaseUrls()
+      .then((urls) => notifyMatrixIdHelper(!!E10Utils.findOaEntry(urls, window.location.href)))
+      .catch((err) => E10Utils.log('矩阵 ID 授权失败', err));
+  }
+
+  window.addEventListener('message', (event) => {
+    if (event.source !== window || event.data?.type !== 'E10_HELPER_MATRIX_READY') return;
+    refreshMatrixIdAuthorization();
+  });
+
   // --- 非生产环境全屏柔光边框 ---
   const ENV_COLORS = {
     dev:     { border: 'rgba(255, 152, 0, 0.55)',  label: '开发环境', labelBg: '#FF9800' },
@@ -745,6 +769,9 @@
     if (area === 'local' && (changes.showEnvironmentBorder || changes.oaBaseUrls)) {
       refreshEnvironmentBorder().catch((err) => E10Utils.log('刷新环境边框失败', err));
     }
+    if (area === 'local' && changes.oaBaseUrls) {
+      refreshMatrixIdAuthorization();
+    }
   });
 
   // 初始化不应阻塞消息监听，避免存储或页面初始化异常导致所有弹窗功能不可用。
@@ -760,6 +787,9 @@
     const isOaPage = !!E10Utils.findOaEntry(oaUrls, window.location.href);
 
     await refreshEnvironmentBorder();
+
+    // 与 Show Console 无关：命中已配置 OA 地址就启用矩阵 ID 显示
+    notifyMatrixIdHelper(isOaPage);
 
     if (showConsole && isOaPage) {
       if (!hasConsoleParam()) {
